@@ -9,24 +9,29 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: frontend
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build Frontend
         run: npm run build
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: frontend-artifact
-          path: dist/
+          path: frontend/dist/
