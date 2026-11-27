@@ -6,23 +6,19 @@ on:
     branches:
       - main
     paths:
-      - 'backend/auth-service/**'
+      - 'backend/**'
       - '.github/workflows/backend-ci.yaml'
 
   pull_request:
     branches:
       - main
     paths:
-      - 'backend/auth-service/**'
+      - 'backend/**'
       - '.github/workflows/backend-ci.yaml'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: backend/auth-service
 
     steps:
       - name: Checkout Code
@@ -33,12 +29,27 @@ jobs:
         with:
           python-version: '3.13'
           cache: 'pip'
-          cache-dependency-path: backend/auth-service/requirements.txt
+          cache-dependency-path: 'backend/**/requirements.txt'
+
+      - name: Upgrade Pip
+        run: python -m pip install --upgrade pip
 
       - name: Install Dependencies
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          services=("auth-service" "analytics-service" "cart-service" "catalog-service" "gateway" "order-service" "payment-service" "quiz-service")
+
+          for service in "${services[@]}"
+          do
+            echo "Installing dependencies for $service"
+            python -m pip install -r backend/$service/requirements.txt
+          done
 
       - name: Validate Python Syntax
-        run: python -m compileall -q .
+        run: |
+          services=("auth-service" "analytics-service" "cart-service" "catalog-service" "gateway" "order-service" "payment-service" "quiz-service")
+
+          for service in "${services[@]}"
+          do
+            echo "Validating $service"
+            python -m compileall -q backend/$service
+          done
