@@ -43,13 +43,15 @@ jobs:
             echo "Installing dependencies for $service"
             python -m pip install -r backend/$service/requirements.txt
           done
-
       - name: Validate Python Syntax
         run: |
           services=("auth-service" "analytics-service" "cart-service" "catalog-service" "gateway" "order-service" "payment-service" "quiz-service")
 
           for service in "${services[@]}"
           do
-            echo "Validating $service"
-            python -m compileall -q backend/$service
+            echo "Checking syntax for $service"
+            python -m compileall -q "backend/$service"
           done
+
+      - name: Run Auth Service Tests
+        run: python -m pytest -v backend/auth-service
