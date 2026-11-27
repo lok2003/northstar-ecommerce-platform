@@ -53,5 +53,12 @@ jobs:
             python -m compileall -q "backend/$service"
           done
 
-      - name: Run Auth Service Tests
-        run: python -m pytest -v backend/auth-service
+      - name: Run Backend Service Tests
+        run: |
+          services=("auth-service" "analytics-service" "cart-service" "catalog-service" "gateway" "order-service" "payment-service" "quiz-service")
+
+          for service in "${services[@]}"
+          do
+            echo "Running tests for $service"
+            (cd "backend/$service" && python -m pytest -v) || exit 1
+          done
